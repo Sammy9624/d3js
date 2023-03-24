@@ -40,7 +40,7 @@ async function draw() {
   const yScale = d3
     .scaleLinear()
     .domain(d3.extent(dataset, yAccessor))
-    .rangeRound([0, dimensions.ctrHeight])
+    .rangeRound([dimensions.ctrHeight, 0])
     .nice()
     .clamp(true);
   ctr
@@ -50,8 +50,41 @@ async function draw() {
     .attr("cx", (d) => xScale(xAccessor(d)))
     .attr("cy", (d) => yScale(yAccessor(d)))
     .attr("r", 5)
-    .attr("fill", "red");
+    .attr("fill", "red")
+    .attr("data-temp", yAccessor);
   // ctr.append("circle").attr("r", 15);
+
+  //XAxes
+
+  const x_axes = d3
+    .axisBottom(xScale)
+    .ticks(5)
+    .tickFormat((d) => d * 100 + "%");
+  const XAxisGroup = ctr
+    .append("g")
+    .call(x_axes)
+    .style("transform", `translateY(${dimensions.ctrHeight}px)`)
+    .classed("axis", true);
+
+  XAxisGroup.append("text")
+    .attr("x", dimensions.ctrWidth / 2)
+    .attr("y", dimensions.margin.bottom - 10)
+    .attr("fill", "black")
+    .text("Humidity");
+
+  //yAxes
+
+  const y_axes = d3.axisLeft(yScale);
+
+  const YAxisGroup = ctr.append("g").call(y_axes).classed("axis", true);
+
+  YAxisGroup.append("text")
+    .attr("x", -dimensions.ctrHeight / 2)
+    .attr("y", -dimensions.margin.left + 15)
+    .attr("fill", "black")
+    .html("Humidity &deg; F")
+    .style("transform", "rotate(270deg)")
+    .style("text-anchor", "middle");
 }
 
 draw();
